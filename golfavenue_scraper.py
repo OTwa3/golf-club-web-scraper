@@ -7,6 +7,9 @@ def scrape_golfavenue(search_term, hand_filter="All", brand_filter=""):
     """
     BASE_URL = "https://www.golfavenue.ca/en/search"
 
+    if search_term == "Irons":
+        search_term = "individual-irons"
+
     # Build URL path
     brand_term = brand_filter.replace(" ", "").lower() if brand_filter else ""
     search_term_clean = search_term.replace(" ", "").lower()

@@ -20,7 +20,7 @@ def get_brand_id(brand_name):
         return None
     return BRAND_MAP.get(brand_name.lower())
 
-def scrape_globalgolf(search_term, hand_filter="All", brand_name=""):
+def scrape_globalgolf(search_term, hand_filter="All", brand_filter=""):
     BASE_URL = "https://www.globalgolf.ca/search/clubs/"
     params = {"term": search_term}
 
@@ -31,7 +31,7 @@ def scrape_globalgolf(search_term, hand_filter="All", brand_name=""):
         params["dxt"] = "2"
 
     # Brand filter
-    brand_id = get_brand_id(brand_name)
+    brand_id = get_brand_id(brand_filter)
     if brand_id:
         params["bid"] = str(brand_id)
 
@@ -46,7 +46,6 @@ def scrape_globalgolf(search_term, hand_filter="All", brand_name=""):
     soup = BeautifulSoup(resp.text, "html.parser")
     items = []
 
-    # Updated selector for GlobalGolf products
     products = soup.select("div.catprod.s-fit.con")
     for prod in products:
         try:

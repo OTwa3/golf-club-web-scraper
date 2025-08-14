@@ -9,7 +9,7 @@ def get_connection():
 def setup_database():
     conn = get_connection()
     cur = conn.cursor()
-    # cur.execute("DROP TABLE IF EXISTS items")
+    cur.execute("DROP TABLE IF EXISTS items")
     cur.execute("""
         CREATE TABLE IF NOT EXISTS items (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,6 +37,15 @@ def parse_price(price_str):
         return float(match.group())
     return None
 
+
+# Price conversion
+def extract_lowest_price(price_str):
+    price_str = str(price_str).replace(",", "").replace("$", "").strip()
+    
+    numbers = re.findall(r"\d+\.?\d*", price_str)  
+    numbers = [float(n) for n in numbers]
+
+    return min(numbers) if numbers else float("nan")
 
 
 def insert_items_bulk(items):
