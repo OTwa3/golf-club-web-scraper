@@ -1,66 +1,54 @@
-import time
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import undetected_chromedriver as uc
+import requests
+from bs4 import BeautifulSoup
 
-def scrape_golfavenue(search_term):
+def scrape_golfavenue(search_term, hand_filter="All", brand_filter=""):
+    """
+    Scrape GolfAvenue products using generated search URL.
+    """
     BASE_URL = "https://www.golfavenue.ca/en/search"
-    search_url = f"{BASE_URL}?q={search_term.replace(' ', '+')}"
-    
-    options = uc.ChromeOptions()
-    options.add_argument("--headless")
-    options.add_argument("--no-first-run --no-service-autorun --password-store=basic")
-    
-    driver = uc.Chrome(options=options)
-    driver.get(search_url)
 
-    wait = WebDriverWait(driver, 20)
+    # Build URL path
+    brand_term = brand_filter.replace(" ", "").lower() if brand_filter else ""
+    search_term_clean = search_term.replace(" ", "").lower()
+    hand_term = ""
+    if hand_filter.lower() == "left hand":
+        hand_term = "left-handed"
+    elif hand_filter.lower() == "right hand":
+        hand_term = "right-handed"
 
-    # Filter results to left-handed dexterity
-    left_handed_checkbox = wait.until(EC.element_to_be_clickable(
-        (By.XPATH, "//a[contains(text(), 'Left-Handed')]")
-    ))
+    path = f"{search_term_clean}"
 
-    left_handed_checkbox.click()
+    if (brand_term):
+        path += f"/{brand_term}"
+    if hand_term:
+        path += f"/{hand_term}"
 
-    # Open product type dropdown
-    dropdown_trigger = wait.until(EC.element_to_be_clickable(
-        (By.CSS_SELECTOR, "div.main-filter-laps-product-type[data-role='trigger']")
-    ))
-    dropdown_trigger.click()
+    url = f"{BASE_URL}/{path}?q={search_term.replace(' ', '+')}"
+    print(f"Fetching URL: {url}")
 
-
-    # Filter results to driver
-    driver_checkbox = wait.until(EC.element_to_be_clickable(
-        (By.XPATH, "//a[contains(text(), 'Driver')]")
-    ))
-
-    driver_checkbox.click()
-
-    # Wait for product tiles to load
-    wait = WebDriverWait(driver, 15)
-    try:
-        wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.product-item, div.product-tile")))
-    except:
-        print("No products found or page took too long to load.")
-        driver.quit()
+    # Get page content
+    headers = {"User-Agent": "Mozilla/5.0"}
+    resp = requests.get(url, headers=headers)
+    if resp.status_code != 200:
+        print("Failed to fetch page")
         return []
-    
-    wait = WebDriverWait(driver, 2)
-    
-    products = driver.find_elements(By.CSS_SELECTOR, "div.product-item, div.product-tile")
 
-    # Extract product information
+    soup = BeautifulSoup(resp.text, "html.parser")
     items = []
-    products = driver.find_elements(By.CSS_SELECTOR, "div.item.product")
+
+    # Find product tiles
+    products = soup.select("div.product-item, div.product-tile")
     for prod in products:
         try:
-            title_elem = prod.find_element(By.CSS_SELECTOR, "strong.product-item-name a")
-            price_elem = prod.find_element(By.CSS_SELECTOR, "span.price-wrapper span.price")
-            link = title_elem.get_attribute("href")
+            title_elem = prod.select_one("strong.product-item-name a")
+            price_elem = prod.select_one("span.price-wrapper span.price")
+            if not title_elem or not price_elem:
+                continue
+
             title = title_elem.text.strip()
+            link = title_elem["href"]
             price = price_elem.text.strip()
+
             items.append({
                 "title": title,
                 "price": price,
@@ -69,7 +57,6 @@ def scrape_golfavenue(search_term):
             })
         except Exception:
             continue
-    
-    driver.quit()
-    print(f"\nTotal items scraped from GolfAvenue: {len(items)}")
+
+    print(f"Total items scraped from GolfAvenue: {len(items)}")
     return items

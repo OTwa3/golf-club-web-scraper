@@ -37,6 +37,9 @@ if st.button("Search"):
     df = run_query(query, params)
 
     if not df.empty:
+        # Format price as $CAD
+        df["price"] = df["price"].apply(lambda x: f"${x:,.2f} CAD" if x is not None else "")
+        
         # Make title clickable and drop link column
         df["title"] = df.apply(lambda row: f'<a href="{row["link"]}" target="_blank">{row["title"]}</a>', axis=1)
         df = df.drop(columns=["link"])

@@ -8,10 +8,10 @@ setup_database()
 
 all_items = []
 
-all_items += scrape_facebook_marketplace("Driver LH")
-all_items += scrape_golfavenue("Driver")
-all_items += scrape_globalgolf("Driver")
-all_items += scrape_golfstuff("Driver")
+# all_items += scrape_facebook_marketplace("Driver LH")
+all_items += scrape_golfavenue("Drivers", "Left Hand", "Callaway")
+all_items += scrape_globalgolf("Drivers", "Left Hand", "Callaway")
+all_items += scrape_golfstuff("Drivers", "Left Hand", "Callaway")
 
 
 insert_items_bulk(all_items)

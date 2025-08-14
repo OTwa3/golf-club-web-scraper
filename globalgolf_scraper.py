@@ -1,62 +1,78 @@
-import time
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import undetected_chromedriver as uc
+import requests
+from bs4 import BeautifulSoup
 
-def scrape_globalgolf(search_term):
-    BASE_URL = "https://www.globalgolf.ca/search/clubs/?dxt=1&"
-    search_url = f"{BASE_URL}term={search_term.replace(' ', '+')}"
+BRAND_MAP = {
+    "taylormade": 27,
+    "callaway": 4,
+    "cleveland": 6,
+    "mizuno": 13,
+    "ping": 20,
+    "cobra": 7,
+    "titleist": 29,
+    "krank": 486,
+    "srixon": 25,
+    "xxio": 1051,
+    "pxg" : 1130
+}
 
+def get_brand_id(brand_name):
+    if not brand_name:
+        return None
+    return BRAND_MAP.get(brand_name.lower())
 
-    options = uc.ChromeOptions()
-    options.add_argument("--headless")
-    options.add_argument("--no-first-run --no-service-autorun --password-store=basic")
+def scrape_globalgolf(search_term, hand_filter="All", brand_name=""):
+    BASE_URL = "https://www.globalgolf.ca/search/clubs/"
+    params = {"term": search_term}
 
-    driver = uc.Chrome(options=options)
-    driver.get(search_url)
+    # Hand filter
+    if hand_filter.lower() == "left hand":
+        params["dxt"] = "1"
+    elif hand_filter.lower() == "right hand":
+        params["dxt"] = "2"
 
-    wait = WebDriverWait(driver, 15)
+    # Brand filter
+    brand_id = get_brand_id(brand_name)
+    if brand_id:
+        params["bid"] = str(brand_id)
 
-    # Close any popups if present
-    try:
-        close_btn = driver.find_element(By.XPATH, "//div[@aria-label='Close']")
-        close_btn.click()
-        time.sleep(1)
-    except:
-        pass
-    
-
-    # Wait for product tiles to load
-    try:
-        wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.catprod.s-fit.con")))
-    except:
-        print("No products found or page took too long to load.")
-        driver.quit()
+    headers = {"User-Agent": "Mozilla/5.0"}
+    resp = requests.get(BASE_URL, params=params, headers=headers)
+    if resp.status_code != 200:
+        print("Failed to fetch page")
         return []
 
-    products = driver.find_elements(By.CSS_SELECTOR, "div.catprod.s-fit.con")
+    print(f"Fetching URL: {resp.url}")
 
+    soup = BeautifulSoup(resp.text, "html.parser")
     items = []
+
+    # Updated selector for GlobalGolf products
+    products = soup.select("div.catprod.s-fit.con")
     for prod in products:
         try:
-            title_elem = prod.find_element(By.CSS_SELECTOR, "h3")
-            used_price_elem = prod.find_element(By.CSS_SELECTOR, "button.price span:last-of-type")
-            brand_elem = prod.find_element(By.CSS_SELECTOR, "div.mrg-10")
-            link_elem = prod.find_element(By.CSS_SELECTOR, "a.gllrylnk")
-            title = title_elem.text.strip()
-            price = used_price_elem.text.strip()
-            brand = brand_elem.text.strip()
+            title_elem = prod.select_one("h3")
+            price_elem = prod.select_one("button.price span:last-of-type")
+            brand_elem = prod.select_one("div.mrg-10")
+            link_elem = prod.select_one("a.gllrylnk")
+
+            if not title_elem or not price_elem or not brand_elem or not link_elem:
+                continue
+
+            title = f"{brand_elem.text.strip()} {title_elem.text.strip()}"
+            price = price_elem.text.strip()
+            link = link_elem["href"]
 
             items.append({
-                "title": brand + " " + title,
+                "title": title,
                 "price": price,
-                "link": link_elem.get_attribute("href"),
+                "link": link,
                 "source": "GlobalGolf"
             })
         except Exception:
             continue
 
-    driver.quit()
-    print(f"\nTotal items scraped from GlobalGolf: {len(items)}")
+    print(f"Total items scraped from GlobalGolf: {len(items)}")
     return items
+
+
+

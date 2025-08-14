@@ -1,67 +1,56 @@
-import time
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import undetected_chromedriver as uc
+import requests
+from bs4 import BeautifulSoup
 
-def scrape_golfstuff(search_term):
-    BASE_URL = "https://justgolfstuff.ca/collections/drivers?pf_opt_hand=Left+Hand"
-    #search_url = f"{BASE_URL}?term={search_term.replace(' ', '+')}"
-    search_url = BASE_URL
-
-    options = uc.ChromeOptions()
-    options.add_argument("--headless")
-    options.add_argument("--no-first-run --no-service-autorun --password-store=basic")
-
-    driver = uc.Chrome(options=options)
-    driver.get(search_url)
-
-    wait = WebDriverWait(driver, 15)
-
-    # Close any popups if present
-    try:
-        close_btn = driver.find_element(By.XPATH, "//div[@aria-label='Close']")
-        close_btn.click()
-        time.sleep(1)
-    except:
-        pass
+def scrape_golfstuff(search_term, hand_filter="All", brand_filter=""):
+    BASE_URL = f"https://justgolfstuff.ca/collections/{search_term.replace(' ', '+')}"
     
+    # Build query params
+    params = {}
+    if hand_filter != "All":
+        params["pf_opt_hand"] = hand_filter.replace(' ', '+')
+    if brand_filter:
+        params["pf_t_brand"] = brand_filter.replace(' ', '+')
+        params["pf_t_brand_and_condition"] = "true"
 
-    # Wait for product tiles to load
-    try:
-        wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.product-item")))
-    except:
-        print("No products found or page took too long to load.")
-        driver.quit()
+    headers = {"User-Agent": "Mozilla/5.0"}
+    resp = requests.get(BASE_URL, params=params, headers=headers)
+    if resp.status_code != 200:
+        print(f"Failed to fetch page: {resp.status_code}")
         return []
 
-    products = driver.find_elements(By.CSS_SELECTOR, "div.product-item")
-
+    soup = BeautifulSoup(resp.text, "html.parser")
     items = []
+
+    print(f"Fetching URL: {resp.url}")
+
+    products = soup.select("div.product-item")
     for prod in products:
         try:
-            # Title and link
-            title_elem = prod.find_element(By.CSS_SELECTOR, "a.product-item__title")
-            link = title_elem.get_attribute("href")
+
+            title_elem = prod.select_one("a.product-item__title")
+            price_elem = prod.select_one("span.price--highlight") or prod.select_one("span.price--regular")
+            if not title_elem or not price_elem:
+                continue
+
             title = title_elem.text.strip()
 
-            # Price (take sale price if available)
-            try:
-                price_elem = prod.find_element(By.CSS_SELECTOR, "span.price--highlight")
-            except:
-                price_elem = prod.find_element(By.CSS_SELECTOR, "span.price--regular")
+            # Check if brand_filter is in the title, if not skip
+            if brand_filter and brand_filter.lower() not in title.lower():
+                continue
+
             price = price_elem.text.strip()
+            link = title_elem["href"]
+            if link.startswith("/"):
+                link = "https://justgolfstuff.ca" + link
 
             items.append({
                 "title": title,
                 "price": price,
-                "link": "https://justgolfstuff.ca" + link if link.startswith("/") else link,
+                "link": link,
                 "source": "JustGolfStuff"
             })
         except Exception:
             continue
 
-    driver.quit()
-    print(f"\nTotal items scraped from Just Golf Stuff: {len(items)}")
+    print(f"Total visible items scraped from Just Golf Stuff: {len(items)}")
     return items
-
