@@ -2,8 +2,12 @@ import requests
 from bs4 import BeautifulSoup
 
 def scrape_golfstuff(search_term, hand_filter="All", brand_filter=""):
+
+    if search_term.lower() == "fairway woods":
+        search_term = "woods"
+
     BASE_URL = f"https://justgolfstuff.ca/collections/{search_term.replace(' ', '+')}"
-    
+
     # Build query params
     params = {}
     if hand_filter != "All":
@@ -15,7 +19,7 @@ def scrape_golfstuff(search_term, hand_filter="All", brand_filter=""):
     headers = {"User-Agent": "Mozilla/5.0"}
     resp = requests.get(BASE_URL, params=params, headers=headers)
     if resp.status_code != 200:
-        print(f"Failed to fetch page: {resp.status_code}")
+        print(f"Failed to fetch page: {resp.url} with error {resp.status_code}")
         return []
 
     soup = BeautifulSoup(resp.text, "html.parser")

@@ -20,7 +20,7 @@ scrapers_to_run = {
 }
 
 st.subheader("Search parameters")
-golf_search_term = st.text_input("Club type", value="")
+golf_search_term = st.selectbox("Club type", ["Drivers", "Fairway Woods", "Hybrids", "Irons", "Wedges", "Putters"])
 brand_filter = st.text_input("Brand (optional)", value="")
 hand_filter = st.selectbox("Hand Filter", ["All", "Left Hand", "Right Hand"])
 
