@@ -83,9 +83,8 @@ View and sort results, click titles to visit product pages
 - Submit a Pull Request
 
 ## ⚠️ Notes & Limitations
-- Scraping may be blocked or limited by certain websites — please scrape responsibly
-- Multi-page scraping stops when duplicate items are detected
-- Site structure changes may require scraper updates
+- Web scrapers are delicate and may break if a website updates its structure
+- Please submit an issue if you notice missing or incorrect data
 
 ## 📜 License
 - This project is licensed under the MIT License.
