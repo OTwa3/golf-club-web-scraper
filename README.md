@@ -5,8 +5,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 
-Golf Club Web Scraper is a **live web application** that searches and aggregates **used golf club listings** from multiple online retailers.  
-It helps golfers quickly compare prices, filter by specs, and find the best deals.
+Golf Club Web Scraper is a web application that searches and aggregates **used golf club listings** from multiple online retailers.  
+It helps golfers quickly compare golf club prices, filter by specs, and find the best deals.
 
 https://github.com/user-attachments/assets/f8c74d2e-dd6b-4bee-b30a-b22e2d2f288b
 
