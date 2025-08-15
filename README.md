@@ -67,30 +67,30 @@ Click Search
 View and sort results, click titles to visit product pages
 
 ## 🛠 Future Features / Roadmap
- Add more golf retailers (2nd Swing, Golf Galaxy, PGA Tour Superstore)
- Export results to CSV/Excel
- Email alerts for new deals
- Advanced filters (loft, shaft flex, condition)
- Mobile-friendly UI improvements
- Save searches for quick access
- Public deployment with analytics
+ - Add more golf retailers (2nd Swing, Golf Galaxy, PGA Tour Superstore)
+ - Export results to CSV/Excel
+ - Email alerts for new deals
+ - Advanced filters (loft, shaft flex, condition)
+ - Mobile-friendly UI improvements
+ - Save searches for quick access
+ - Public deployment with analytics
 
 ## 🤝 Contributing
-Contributions are welcome!
-Fork the repo
-Create a branch (git checkout -b feature-name)
-Commit changes
-Submit a Pull Request
+- Contributions are welcome!
+- Fork the repo
+- Create a branch (git checkout -b feature-name)
+- Commit changes
+- Submit a Pull Request
 
 ## ⚠️ Notes & Limitations
-Scraping may be blocked or limited by certain websites — please scrape responsibly
-Multi-page scraping stops when duplicate items are detected
-Site structure changes may require scraper updates
+- Scraping may be blocked or limited by certain websites — please scrape responsibly
+- Multi-page scraping stops when duplicate items are detected
+- Site structure changes may require scraper updates
 
 ## 📜 License
-This project is licensed under the MIT License.
+- This project is licensed under the MIT License.
 
 ## Support
-💡 If you found this project helpful, give it a ⭐ on GitHub to help more golfers find it!
+- 💡 If you found this project helpful, give it a ⭐ on GitHub to help more golfers find it!
 
 
