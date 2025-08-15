@@ -47,8 +47,10 @@ pip install -r requirements.txt
 
 
 ## 🚀 Usage
-Run the Streamlit app:
+### Run the Streamlit app:
+```bash
 streamlit run ui/scraper_ui.py
+```
 Then:
 Select which websites to scrape
 Enter search parameters (club type, brand, hand orientation)
