@@ -4,7 +4,7 @@ from globalgolf_scraper import scrape_globalgolf
 from golfstuff_scraper import scrape_golfstuff
 from utils import insert_items_bulk, setup_database
 
-setup_database()
+# setup_database()
 
 all_items = []
 
@@ -14,5 +14,5 @@ all_items += scrape_globalgolf("Drivers", "All", "TaylorMade")
 #all_items += scrape_golfstuff("Drivers", "Left Hand", "Callaway")
 
 
-insert_items_bulk(all_items)
+# insert_items_bulk(all_items)
 print(f"Inserted {len(all_items)} items into the database.")

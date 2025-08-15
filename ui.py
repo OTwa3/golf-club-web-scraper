@@ -13,7 +13,7 @@ st.title("Golf Club Web Scraper")
 
 st.subheader("Select sources to scrape")
 scrapers_to_run = {
-    "Facebook Marketplace": st.checkbox("Facebook Marketplace", value=False),
+    # "Facebook Marketplace": st.checkbox("Facebook Marketplace", value=False),
     "GolfAvenue": st.checkbox("GolfAvenue", value=True),
     "GlobalGolf": st.checkbox("GlobalGolf", value=True),
     "JustGolfStuff": st.checkbox("JustGolfStuff", value=True)
@@ -25,9 +25,9 @@ brand_filter = st.text_input("Brand (optional)", value="")
 hand_filter = st.selectbox("Hand Filter", ["All", "Left Hand", "Right Hand"])
 
 # Facebook Search Term Only
-fb_search_term = ""
-if scrapers_to_run["Facebook Marketplace"]:
-    fb_search_term = st.text_input("Facebook Marketplace Search", value="Driver LH")
+# fb_search_term = ""
+# if scrapers_to_run["Facebook Marketplace"]:
+#     fb_search_term = st.text_input("Facebook Marketplace Search", value="Driver LH")
 
 
 # Search button
@@ -35,8 +35,8 @@ if st.button("Search"):
     with st.spinner("Scraping selected sources..."):
         all_items = []
 
-        if scrapers_to_run["Facebook Marketplace"]:
-            all_items += scrape_facebook_marketplace(fb_search_term, brand_filter=brand_filter)
+        # if scrapers_to_run["Facebook Marketplace"]:
+        #     all_items += scrape_facebook_marketplace(fb_search_term, brand_filter=brand_filter)
 
         if scrapers_to_run["GolfAvenue"]:
             all_items += scrape_golfavenue(search_term=golf_search_term, hand_filter=hand_filter, brand_filter=brand_filter)
