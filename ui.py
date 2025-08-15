@@ -2,9 +2,9 @@ import streamlit as st
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from utils import extract_lowest_price
-from golfavenue_scraper import scrape_golfavenue
-from globalgolf_scraper import scrape_globalgolf
-from golfstuff_scraper import scrape_golfstuff
+from scrapers.golfavenue_scraper import scrape_golfavenue
+from scrapers.globalgolf_scraper import scrape_globalgolf
+from scrapers.golfstuff_scraper import scrape_golfstuff
 
 st.set_page_config(page_title="Golf Club Price Compare", layout="wide")
 st.title("Golf Club Price Compare")
