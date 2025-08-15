@@ -71,11 +71,10 @@ pip install -r requirements.txt
 ```bash
 streamlit run ui.py
 ```
-Then:
-Select which websites to scrape
-Enter search parameters (club type, brand, hand orientation)
-Click Search
-View and sort results, click titles to visit product pages
+- Select which websites to scrape
+- Enter search parameters (club type, brand, hand orientation)
+- Click Search
+- View and sort results, click titles to visit product pages
 
 ---
 
@@ -110,7 +109,7 @@ View and sort results, click titles to visit product pages
 
 ---
 
-## Support
-- 💡 If you found this project helpful, give it a ⭐ on GitHub to help more golfers find it!
+## 💡Support
+- If you found this project helpful, give it a ⭐ on GitHub to help more golfers find it!
 
 
