@@ -6,8 +6,8 @@ from golfavenue_scraper import scrape_golfavenue
 from globalgolf_scraper import scrape_globalgolf
 from golfstuff_scraper import scrape_golfstuff
 
-st.set_page_config(page_title="Golf Club Web Scraper", layout="wide")
-st.title("Golf Club Web Scraper")
+st.set_page_config(page_title="Golf Club Price Compare", layout="wide")
+st.title("Golf Club Price Compare")
 
 # --- SOURCE SELECTION ---
 st.subheader("Data Sources")
@@ -94,13 +94,20 @@ if st.session_state.get("scrape_done"):
 
         st.markdown("""
         <style>
-            .table-container {overflow-x: auto; width: 100%;}
-            table {border-collapse: collapse; width: 100%;}
-            th, td {padding: 8px 12px; text-align: left !important;}
-            th {background-color: #f0f0f0;}
-            tr:nth-child(even) {background-color: #f9f9f9;}
-            a {color: #1a73e8; text-decoration: none;}
-            a:hover {text-decoration: underline;}
+        .table-container {overflow-x: auto; width: 100%;}
+        table {border-collapse: collapse; width: 100%;}
+        th, td {padding: 8px 12px; text-align: left !important;}
+        
+        /* Table header */
+        th {background-color: #4a4a4a; color: #fff;}
+        
+        /* Table rows: alternate subtle shading that works in dark mode */
+        tr:nth-child(even) {background-color: rgba(255, 255, 255, 0.05);}
+        tr:nth-child(odd) {background-color: rgba(255, 255, 255, 0.02);}
+        
+        /* Links */
+        a {color: #1a73e8; text-decoration: none;}
+        a:hover {text-decoration: underline;}
         </style>
         """, unsafe_allow_html=True)
         st.markdown(f'<div class="table-container">{df.to_html(escape=False, index=False)}</div>', unsafe_allow_html=True)
