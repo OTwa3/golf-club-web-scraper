@@ -1,98 +1,108 @@
 import streamlit as st
 import pandas as pd
-from utils import insert_items_bulk, setup_database, extract_lowest_price
-from fb_marketplace_scraper import scrape_facebook_marketplace
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from utils import extract_lowest_price
 from golfavenue_scraper import scrape_golfavenue
 from globalgolf_scraper import scrape_globalgolf
 from golfstuff_scraper import scrape_golfstuff
 
-
 st.set_page_config(page_title="Golf Club Web Scraper", layout="wide")
 st.title("Golf Club Web Scraper")
 
+# --- SOURCE SELECTION ---
+st.subheader("Data Sources")
+col1, col2, col3 = st.columns(3)
+with col1:
+    golfavenue_on = st.checkbox("GolfAvenue", value=True)
+    globalgolf_on = st.checkbox("GlobalGolf", value=True)
+    golfstuff_on = st.checkbox("JustGolfStuff", value=True)
+    
+# --- SEARCH PARAMETERS ---
+st.subheader("Search Filters")
+col1, col2, col3 = st.columns([1,1,1])
+with col1:
+    golf_search_term = st.selectbox("Club Type", ["Drivers", "Fairway Woods", "Hybrids", "Irons", "Wedges", "Putters"])
+with col2:
+    brand_filter = st.text_input("Brand (optional)")
+with col3:
+    hand_filter = st.selectbox("Hand", ["All", "Left Hand", "Right Hand"])
 
-st.subheader("Select sources to scrape")
-scrapers_to_run = {
-    # "Facebook Marketplace": st.checkbox("Facebook Marketplace", value=False),
-    "GolfAvenue": st.checkbox("GolfAvenue", value=True),
-    "GlobalGolf": st.checkbox("GlobalGolf", value=True),
-    "JustGolfStuff": st.checkbox("JustGolfStuff", value=True)
-}
+# --- SEARCH BUTTON ---
+if st.button("Search Clubs", use_container_width=True):
+    all_items = []
+    progress_placeholder = st.empty()
+    progress_bar = progress_placeholder.progress(0)
 
-st.subheader("Search parameters")
-golf_search_term = st.selectbox("Club type", ["Drivers", "Fairway Woods", "Hybrids", "Irons", "Wedges", "Putters"])
-brand_filter = st.text_input("Brand (optional)", value="")
-hand_filter = st.selectbox("Hand Filter", ["All", "Left Hand", "Right Hand"])
+    scrapers = [
+        ("GolfAvenue", golfavenue_on, scrape_golfavenue),
+        ("GlobalGolf", globalgolf_on, scrape_globalgolf),
+        ("JustGolfStuff", golfstuff_on, scrape_golfstuff)
+    ]
 
-# Facebook Search Term Only
-# fb_search_term = ""
-# if scrapers_to_run["Facebook Marketplace"]:
-#     fb_search_term = st.text_input("Facebook Marketplace Search", value="Driver LH")
+    active_scrapers = [(name, func) for name, on, func in scrapers if on]
+    total_scrapers = len(active_scrapers)
+    completed_scrapers = 0
 
+    def run_scraper(name, func):
+        # Run scraper and return results
+        return func(golf_search_term, hand_filter, brand_filter)
 
-# Search button
-if st.button("Search"):
     with st.spinner("Scraping selected sources..."):
-        all_items = []
+        with ThreadPoolExecutor(max_workers=total_scrapers) as executor:
+            future_to_name = {executor.submit(run_scraper, name, func): name for name, func in active_scrapers}
+            for future in as_completed(future_to_name):
+                items = future.result()
+                all_items += items
+                completed_scrapers += 1
+                progress_bar.progress(completed_scrapers / total_scrapers)
 
-        # if scrapers_to_run["Facebook Marketplace"]:
-        #     all_items += scrape_facebook_marketplace(fb_search_term, brand_filter=brand_filter)
+    progress_placeholder.empty()  # remove progress bar
 
-        if scrapers_to_run["GolfAvenue"]:
-            all_items += scrape_golfavenue(search_term=golf_search_term, hand_filter=hand_filter, brand_filter=brand_filter)
+    st.session_state["all_items"] = all_items
+    st.session_state["scrape_done"] = True
 
-        if scrapers_to_run["GlobalGolf"]:
-            all_items += scrape_globalgolf(search_term=golf_search_term, hand_filter=hand_filter, brand_filter=brand_filter)
-
-        if scrapers_to_run["JustGolfStuff"]:
-            all_items += scrape_golfstuff(search_term=golf_search_term, hand_filter=hand_filter, brand_filter=brand_filter)
-
-        # Store results in session_state to persist across reruns
-        st.session_state["all_items"] = all_items
-        st.session_state["scrape_done"] = True
-
+# --- RESULTS ---
 if st.session_state.get("scrape_done"):
     all_items = st.session_state.get("all_items", [])
-
-    # Display table
     if all_items:
-        st.success(f"Scraped {len(all_items)} items successfully!")
-
+        st.success(f"✅ Found {len(all_items)} items")
         df = pd.DataFrame(all_items)
-
-        # Price conversion
         df["price_numeric"] = df["price"].apply(extract_lowest_price)
-        df["price"] = df["price_numeric"].apply(lambda x: f"${x:,.2f} CAD" if pd.notnull(x) else "")
 
-        sort_by = st.selectbox("Sort by", ["price", "title"])
-        sort_order = st.radio("Order", ["Ascending", "Descending"])
-        ascending = sort_order == "Ascending"
+        # Filter & sort
+        with st.expander("Filter & Sort Results", expanded=True):
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                local_search = st.text_input("Search in Titles").strip().lower()
+            with col2:
+                sort_by = st.selectbox("Sort by", ["price", "title", "source"])
+            with col3:
+                ascending = st.radio("Order", ["Ascending", "Descending"]) == "Ascending"
+
+        if local_search:
+            df = df[df["title"].str.lower().str.contains(local_search)]
 
         if sort_by == "price":
             df = df.sort_values(by="price_numeric", ascending=ascending)
         else:
-            df = df.sort_values(by="title", ascending=ascending)
+            df = df.sort_values(by=sort_by, ascending=ascending)
 
-        # Price formatting
         df["price"] = df["price_numeric"].apply(lambda x: f"${x:,.2f} CAD" if pd.notnull(x) else "")
         df = df.drop(columns=["price_numeric"])
-
-        # Merge title and link
-        df["title"] = df.apply(lambda row: f'<a href="{row["link"]}" target="_blank">{row["title"]}</a>', axis=1)
+        df["title"] = df.apply(lambda r: f'<a href="{r["link"]}" target="_blank">{r["title"]}</a>', axis=1)
         df = df.drop(columns=["link"])
 
         st.markdown("""
         <style>
             .table-container {overflow-x: auto; width: 100%;}
             table {border-collapse: collapse; width: 100%;}
-            th, td {padding: 8px 12px; text-align: left;}
+            th, td {padding: 8px 12px; text-align: left !important;}
             th {background-color: #f0f0f0;}
             tr:nth-child(even) {background-color: #f9f9f9;}
             a {color: #1a73e8; text-decoration: none;}
             a:hover {text-decoration: underline;}
         </style>
         """, unsafe_allow_html=True)
-
         st.markdown(f'<div class="table-container">{df.to_html(escape=False, index=False)}</div>', unsafe_allow_html=True)
     else:
-        st.warning("No items found - please ensure your search filters are correct.")
+        st.warning("No items found - try different filters.")
