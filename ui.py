@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
+import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from utils import extract_lowest_price
+from utils import extract_lowest_price, token_match
 from scrapers.golfavenue_scraper import scrape_golfavenue
 from scrapers.globalgolf_scraper import scrape_globalgolf
 from scrapers.golfstuff_scraper import scrape_golfstuff
@@ -80,7 +81,7 @@ if st.session_state.get("scrape_done"):
                 ascending = st.radio("Order", ["Ascending", "Descending"]) == "Ascending"
 
         if local_search:
-            df = df[df["title"].str.lower().str.contains(local_search)]
+            df = df[df["title"].apply(lambda t: token_match(t, local_search))]
 
         if sort_by == "price":
             df = df.sort_values(by="price_numeric", ascending=ascending)

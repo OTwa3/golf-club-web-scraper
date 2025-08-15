@@ -47,6 +47,13 @@ def extract_lowest_price(price_str):
 
     return min(numbers) if numbers else float("nan")
 
+# token matching for search
+def token_match(title, query):
+    # Clean and split words
+    title_tokens = re.findall(r"\w+", title.lower())
+    query_tokens = re.findall(r"\w+", query.lower())
+    return all(token in title_tokens for token in query_tokens)
+
 
 # def insert_items_bulk(items):
 #     conn = get_connection()
