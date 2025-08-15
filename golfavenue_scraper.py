@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import time
 
-# TODO: Fix scraping logic, currently not scraping all the results/correct results
 
 def scrape_golfavenue(search_term, hand_filter="All", brand_filter=""):
     BASE_URL = "https://www.golfavenue.ca/en/search"
@@ -80,7 +79,7 @@ def scrape_golfavenue(search_term, hand_filter="All", brand_filter=""):
 
         print(f"Page {page}: {new_items_count} new items scraped.")
         page += 1
-        time.sleep(1)
+        # time.sleep(1)
 
     print(f"Total items scraped from GolfAvenue: {len(all_items)}")
     return all_items

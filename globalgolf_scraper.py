@@ -86,7 +86,7 @@ def scrape_globalgolf(search_term, hand_filter="All", brand_filter=""):
 
         print(f"Page {page}: {new_items_count} new items scraped.")
         page += 1
-        time.sleep(1)
+        # time.sleep(1)
 
     print(f"Total items scraped from GlobalGolf: {len(all_items)}")
     return all_items

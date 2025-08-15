@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 
+# TODO: Fix scraping logic, currently not scraping all the results/correct results
+
 def scrape_golfstuff(search_term, hand_filter="All", brand_filter=""):
 
     if search_term.lower() == "fairway woods":
