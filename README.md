@@ -1,12 +1,85 @@
-This is a custom webscraper that specifically targets Canadian used golf club websites. 
+# ⛳ Golf Club Web Scraper
 
-It can be used to compare prices for used and new clubs quickly by setting a few filters. 
-The data can be filtered according to club type, brand, as well as hand dexterity.
+[![Python](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-App-red.svg)](https://streamlit.io/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 
-As of right now, it scrapes 4 websites: Just Golf Stuff, Global Golf, Golf Avenue, as well as local listings in facebook marketplace.
-I plan to expand functionality to as many North American used club websites as I can in the near future.
-
+Golf Club Web Scraper is a **live web application** that searches and aggregates **used golf club listings** from multiple online retailers.  
+It helps golfers quickly compare prices, filter by specs, and find the best deals.
 
 https://github.com/user-attachments/assets/f8c74d2e-dd6b-4bee-b30a-b22e2d2f288b
+
+---
+
+## ✨ Features
+- **Scrape multiple golf stores**:
+  - Golf Avenue
+  - Global Golf
+  - Just Golf Stuff
+  - Facebook Marketplace (WIP)
+- **Smart Filters**:
+  - Club Type (Drivers, Irons, Putters, etc.)
+  - Brand (Callaway, TaylorMade, Ping, etc.)
+  - Hand Orientation (Left, Right, All)
+- **Automatic multi-page scraping**
+- **Price range handling** (takes lowest price for sorting)
+- **Clickable results** linking directly to product pages
+- **Session storage** for quick navigation
+
+---
+
+## 📦 Installation
+
+### Requirements
+- Python **3.9+**
+- `pip`
+
+### Setup
+```bash
+# Clone the repository
+git clone https://github.com/<your-username>/golf-scraper.git
+cd golf-scraper
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+
+🚀 Usage
+Run the Streamlit app:
+streamlit run ui/scraper_ui.py
+Then:
+Select which websites to scrape
+Enter search parameters (club type, brand, hand orientation)
+Click Search
+View and sort results, click titles to visit product pages
+
+🛠 Future Features / Roadmap
+ Add more golf retailers (2nd Swing, Golf Galaxy, PGA Tour Superstore)
+ Export results to CSV/Excel
+ Email alerts for new deals
+ Advanced filters (loft, shaft flex, condition)
+ Mobile-friendly UI improvements
+ Save searches for quick access
+ Public deployment with analytics
+
+🤝 Contributing
+Contributions are welcome!
+Fork the repo
+Create a branch (git checkout -b feature-name)
+Commit changes
+Submit a Pull Request
+
+⚠️ Notes & Limitations
+Scraping may be blocked or limited by certain websites — please scrape responsibly
+Multi-page scraping stops when duplicate items are detected
+Site structure changes may require scraper updates
+
+📜 License
+This project is licensed under the MIT License.
+
+
+
 
 
