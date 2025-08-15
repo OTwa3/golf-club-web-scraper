@@ -41,6 +41,15 @@ https://github.com/user-attachments/assets/f8c74d2e-dd6b-4bee-b30a-b22e2d2f288b
 git clone https://github.com/<your-username>/golf-scraper.git
 cd golf-scraper
 
+# (Optional but recommended) Create a virtual environment
+python -m venv .venv
+
+# Activate the virtual environment
+# Windows:
+.venv\Scripts\activate
+# macOS/Linux:
+source .venv/bin/activate
+
 # Install dependencies
 pip install -r requirements.txt
 ```
@@ -49,7 +58,7 @@ pip install -r requirements.txt
 ## 🚀 Usage
 ### Run the Streamlit app:
 ```bash
-streamlit run ui/scraper_ui.py
+streamlit run scraper_ui.py
 ```
 Then:
 Select which websites to scrape
